@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>5-slice Circle (Wheel with Pointer)</title>
+  <style>
+    body {
+      display:flex;
+      flex-direction: column;
+      height:100vh;
+      margin:0;
+      align-items:center;
+      justify-content:center;
+      background:#f3f4f6;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 420px;
+      height: 420px;
+    }
+
+    svg { width:100%; height:100%; display:block; border-radius:50%; }
+
+    /* ===== POINTER STYLE ===== */
+    .pointer {
+      position: absolute;
+      top: -20px;           /* position above the wheel */
+      left: 50%;
+      transform: translateX(-50%) rotate(180deg);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 25px solid #111827; /* arrow color */
+      z-index: 10;
+    }
+
+    /* ===== SLICE COLORS ===== */
+    #slice-1-alvin { fill: #ff4d4f; }    /* red */
+    #slice-2-paul  { fill: #ffd666; }    /* yellow */
+    #slice-3-joemar{ fill: #5b8def; }    /* blue */
+    #slice-4-gerry { fill: #6fcf97; }    /* green */
+    #slice-5-jaynan{ fill: #ff8fb3; }    /* pink */
+
+    /* Divider lines */
+    .divider { stroke:#ffffff; stroke-width:2; }
+
+    /* Slice hover effect */
+    .slice:hover { filter:brightness(1.3); transform-origin: 200px 200px; }
+
+    /* Text labels inside slices */
+    .slice-label {
+      font-weight:700;
+      font-size:14px;
+      fill:#0f172a;
+      pointer-events:none;
+      text-anchor:middle;
+    }
+
+    /* center circle */
+    .center {
+      fill:#111827;
+      opacity:0.06;
+      stroke:#00000010;
+    }
+
+    /* ===== SPIN BUTTON ===== */
+    .spin-btn {
+      margin-top: 30px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      background: #111827;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .spin-btn:hover {
+      background: #374151;
+    }
+  </style>
+</head>
+<body>
+  <div class="wheel-container">
+    <!-- Pointer Arrow -->
+    <div class="pointer"></div>
+
+    <!-- SVG Wheel -->
+    <svg viewBox="0 0 400 400" id="wheel" aria-label="5-slice wheel" role="img"></svg>
+  </div>
+
+  <!-- SPIN BUTTON -->
+  <button class="spin-btn" id="spinBtn">🎡 Spin</button>
+
+  <script>
+    (function(){
+      const svg = document.getElementById('wheel');
+      const cx = 200, cy = 200;
+      const r = 180;
+      const slices = 5;
+      const names = [
+        {id: 'slice-1-alvin', label: 'Alvin'},
+        {id: 'slice-2-paul', label: 'Paul'},
+        {id: 'slice-3-joemar', label: 'Joemar'},
+        {id: 'slice-4-gerry', label: 'Gerry'},
+        {id: 'slice-5-jaynan', label: 'Jaynan'}
+      ];
+
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      svg.appendChild(g);
+
+      // Create slices
+      for (let i=0;i<slices;i++){
+        const startAngle = (i * 2 * Math.PI / slices) - Math.PI/2;
+        const endAngle   = ((i+1) * 2 * Math.PI / slices) - Math.PI/2;
+        const x1 = cx + r * Math.cos(startAngle);
+        const y1 = cy + r * Math.sin(startAngle);
+        const x2 = cx + r * Math.cos(endAngle);
+        const y2 = cy + r * Math.sin(endAngle);
+        const largeArc = (endAngle - startAngle) > Math.PI ? 1 : 0;
+
+        const d = [
+          `M ${cx} ${cy}`,
+          `L ${x1.toFixed(3)} ${y1.toFixed(3)}`,
+          `A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(3)} ${y2.toFixed(3)}`,
+          'Z'
+        ].join(' ');
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('d', d);
+        path.setAttribute('id', names[i].id);
+        path.setAttribute('class', 'slice');
+        path.setAttribute('stroke', 'white');
+        path.setAttribute('stroke-width', '1.5');
+        g.appendChild(path);
+
+        // labels
+        const midAngle = (startAngle + endAngle) / 2;
+        const labelRadius = r * 0.62;
+        const lx = cx + labelRadius * Math.cos(midAngle);
+        const ly = cy + labelRadius * Math.sin(midAngle);
+
+        const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+        text.setAttribute('x', lx.toFixed(3));
+        text.setAttribute('y', ly.toFixed(3));
+		text.setAttribute('transform', `rotate(${(midAngle * 180 / Math.PI) + 90} ${lx.toFixed(3)} ${ly.toFixed(3)})`);
+        text.setAttribute('class', 'slice-label');
+        text.textContent = names[i].label;
+        g.appendChild(text);
+      }
+
+      // center circle
+      const centerCircle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      centerCircle.setAttribute('cx', cx);
+      centerCircle.setAttribute('cy', cy);
+      centerCircle.setAttribute('r', 32);
+      centerCircle.setAttribute('class','center');
+      svg.appendChild(centerCircle);
+
+      // === Spin logic ===
+      const spinBtn = document.getElementById('spinBtn');
+      let spinning = false;
+      let currentRotation = 0;
+
+      spinBtn.addEventListener('click', () => {
+        if (spinning) return;
+        spinning = true;
+
+        const randomSpin = 5 + Math.random() * 5; // 5–10 full rotations
+        const extraAngle = Math.random() * 360;   // random stop angle
+        const rotation = currentRotation + randomSpin * 360 + extraAngle;
+
+        svg.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
+        svg.style.transform = `rotate(${rotation}deg)`;
+        currentRotation = rotation;
+
+        setTimeout(() => {
+          spinning = false;
+
+          // Calculate which slice won
+          const normalizedRotation = rotation % 360;
+          const degreesPerSlice = 360 / slices;
+          // Pointer is at the top (0°), so we invert the angle
+          const winningIndex = Math.floor((360 - normalizedRotation) / degreesPerSlice) % slices;
+          const winner = names[winningIndex].label;
+
+          alert(`🎉 Congratulations ${winner}! You WON!`);
+        }, 4000);
+      });
+    })();
+  </script>
+</body>
+</html>
