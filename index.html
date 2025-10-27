@@ -5,194 +5,56 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Bingo Wheel</title>
 <style>
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    margin: 0;
-    background: #f3f4f6;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-    padding-top: 20px;
-    gap: 30px;
-  }
-
-  /* Bingo board on top */
-  .bingo-board {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    border: 3px solid #000;
-    text-align: center;
-    background: #fff;
-    width: 750px;
-    height: 750px;
-  }
-
-  .bingo-cell {
-    border: 1px solid #000;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 18px;
-  }
-
-  .bingo-header {
-    background: #111827;
-    color: white;
-    font-size: 22px;
-  }
-
-  .highlighted {
-    background: #ef4444;
-    border: 2px solid #000;
-    color: white;
-  }
-
-  .controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .reset-btn, .spin-btn {
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    text-align: center;
-  }
-
-  .reset-btn {
-    padding: 12px 24px;
-    font-size: 16px;
-    width: 150px;
-    background: #ef4444;
-    color: white;
-  }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; margin: 0; background: #f3f4f6; font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; padding-top: 20px; gap: 30px; }
+  .bingo-board { display: grid; grid-template-columns: repeat(5, 1fr); border: 3px solid #000; text-align: center; background: #fff; width: 750px; height: 750px; }
+  .bingo-cell { border: 1px solid #000; font-weight: bold; display: flex; justify-content: center; align-items: center; font-size: 18px; }
+  .bingo-header { background: #111827; color: white; font-size: 22px; }
+  .highlighted { background: #ef4444; border: 2px solid #000; color: white; }
+  .controls { display: flex; justify-content: center; align-items: center; }
+  .reset-btn, .spin-btn { font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background 0.3s ease; text-align: center; }
+  .reset-btn { padding: 12px 24px; font-size: 16px; width: 150px; background: #ef4444; color: white; }
   .reset-btn:hover { background: #b91c1c; }
-
-  .spin-btn {
-    padding: 20px 40px; /* bigger button */
-    font-size: 24px;    /* bigger text */
-    width: 250px;       /* wider */
-    background: #111827;
-    color: #fff;
-  }
+  .spin-btn { padding: 20px 40px; font-size: 24px; width: 250px; background: #111827; color: #fff; }
   .spin-btn:hover { background: #374151; }
-
-  /* Bigger wheel without shadow */
-  .wheel-container {
-    position: relative;
-    width: 700px;
-    height: 700px;
-    border-radius: 50%;
-  }
-
+  .wheel-container { position: relative; width: 700px; height: 700px; border-radius: 50%; }
   svg { width:100%; height:100%; display:block; border-radius:50%; }
-
-  .pointer {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%) rotate(180deg);
-    width: 0;
-    height: 0;
-    border-left: 25px solid transparent;
-    border-right: 25px solid transparent;
-    border-bottom: 35px solid #111827;
-    z-index: 10;
-  }
-
-  .color-blue     { fill: #6ec1ff; }
+  .pointer { position: absolute; top: -20px; left: 50%; transform: translateX(-50%) rotate(180deg); width: 0; height: 0; border-left: 25px solid transparent; border-right: 25px solid transparent; border-bottom: 35px solid #111827; z-index: 10; }
+  .color-blue { fill: #6ec1ff; }
   .color-lavender { fill: #c48bff; }
-  .color-yellow   { fill: #ffe066; }
-  .color-green    { fill: #80e472; }
-  .color-orange   { fill: #ffb366; }
-
+  .color-yellow { fill: #ffe066; }
+  .color-green { fill: #80e472; }
+  .color-orange { fill: #ffb366; }
   .slice:hover { filter:brightness(1.15); transform-origin:350px 350px; }
-
-  .slice-label {
-    font-weight:700;
-    font-size:14px;
-    fill:#111;
-    pointer-events:none;
-    text-anchor:middle;
-    dominant-baseline:middle;
-  }
-
-  .center {
-    fill:#111827;
-    opacity:0.06;
-    stroke:#00000010;
-  }
-
-  /* Custom alert */
-  #customAlert {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 25px 30px;
-    border: 3px solid #ef4444;
-    border-radius: 10px;
-    z-index: 1000;
-    font-family: sans-serif;
-    text-align: center;
-  }
-  #customAlert p {
-    margin: 0 0 15px 0;
-    font-size: 80px;
-  }
-  #customAlert button {
-    padding: 8px 20px;
-    font-size: 16px;
-    font-weight: 600;
-    border: none;
-    border-radius: 6px;
-    background: #ef4444;
-    color: white;
-    cursor: pointer;
-  }
+  .slice-label { font-weight:700; font-size:14px; fill:#111; pointer-events:none; text-anchor:middle; dominant-baseline:middle; }
+  .center { fill:#111827; opacity:0.06; stroke:#00000010; }
+  #customAlert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px 30px; border: 3px solid #ef4444; border-radius: 10px; z-index: 1000; font-family: sans-serif; text-align: center; }
+  #customAlert p { margin: 0 0 15px 0; font-size: 80px; }
+  #customAlert button { padding: 8px 20px; font-size: 16px; font-weight: 600; border: none; border-radius: 6px; background: #ef4444; color: white; cursor: pointer; }
   #customAlert button:hover { background: #b91c1c; }
 </style>
 </head>
 <body>
 
-<!-- BINGO BOARD ON TOP -->
 <div class="bingo-board" id="bingoBoard"></div>
-
-<!-- RESET BUTTON BELOW BINGO BOARD -->
 <div class="controls" style="margin-top: 15px;">
   <button class="reset-btn" id="resetBtn">Reset</button>
 </div>
-
-<!-- WHEEL BELOW -->
 <div class="wheel-container">
   <div class="pointer"></div>
   <svg viewBox="0 0 700 700" id="wheel"></svg>
 </div>
-
-<!-- SPIN BUTTON BELOW WHEEL -->
 <div class="controls" style="margin-top: 15px;">
   <button class="spin-btn" id="spinBtn">🎡 Spin</button>
 </div>
 
-<!-- Custom alert -->
 <div id="customAlert">
   <p id="alertText"></p>
   <button onclick="closeAlert()">OK</button>
 </div>
 
-<!-- 🎵 Sound -->
 <audio id="spinSound" src="spineffect.mp3" preload="auto"></audio>
 
 <script>
-// --- Bingo board setup ---
 const board = document.getElementById('bingoBoard');
 const headers = ['B','I','N','G','O'];
 const totalNumbers = 75;
@@ -204,8 +66,8 @@ headers.forEach(h => {
   cell.textContent = h;
   board.appendChild(cell);
 });
-for (let row=0; row<15; row++) {
-  for (let col=0; col<5; col++) {
+for(let row=0; row<15; row++){
+  for(let col=0; col<5; col++){
     const num = col*15 + (row+1);
     const cell = document.createElement('div');
     cell.className = 'bingo-cell';
@@ -215,11 +77,10 @@ for (let row=0; row<15; row++) {
   }
 }
 
-// --- Wheel setup ---
 const svg = document.getElementById('wheel');
-const cx = 350, cy = 350, r = 320;
-const degPerSlice = 360/totalNumbers;
-const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+const cx=350, cy=350, r=320;
+const degPerSlice=360/totalNumbers;
+const g=document.createElementNS('http://www.w3.org/2000/svg','g');
 svg.appendChild(g);
 
 let startDeg=-90;
@@ -232,20 +93,17 @@ for(let i=0;i<totalNumbers;i++){
   const x2=cx+r*Math.cos(endRad);
   const y2=cy+r*Math.sin(endRad);
   const d=`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`;
-
   let colorClass='';
   if(i<15) colorClass='color-blue';
   else if(i<30) colorClass='color-lavender';
   else if(i<45) colorClass='color-yellow';
   else if(i<60) colorClass='color-green';
   else colorClass='color-orange';
-
   const slice=document.createElementNS('http://www.w3.org/2000/svg','path');
   slice.setAttribute('d',d);
   slice.setAttribute('class',`slice ${colorClass}`);
   slice.setAttribute('id',`slice-${i+1}`);
   g.appendChild(slice);
-
   const midDeg=startDeg+degPerSlice/2;
   const midRad=midDeg*Math.PI/180;
   const textR=r*0.9;
@@ -258,10 +116,8 @@ for(let i=0;i<totalNumbers;i++){
   text.setAttribute('transform',`rotate(${midDeg+90},${tx},${ty})`);
   text.textContent=i+1;
   g.appendChild(text);
-
   startDeg=endDeg;
 }
-
 const centerCircle=document.createElementNS('http://www.w3.org/2000/svg','circle');
 centerCircle.setAttribute('cx',cx);
 centerCircle.setAttribute('cy',cy);
@@ -269,14 +125,14 @@ centerCircle.setAttribute('r',40);
 centerCircle.setAttribute('class','center');
 svg.appendChild(centerCircle);
 
-// --- Spin and reset logic ---
 const spinBtn=document.getElementById('spinBtn');
 const resetBtn=document.getElementById('resetBtn');
 const spinSound=document.getElementById('spinSound');
 let spinning=false;
 let currentRotation=0;
-
+let blockRefresh=false;
 let alertTimeout;
+
 function showAlert(msg){
   document.getElementById('alertText').textContent = msg;
   const alertBox = document.getElementById('customAlert');
@@ -286,12 +142,21 @@ function showAlert(msg){
 }
 function closeAlert(){ document.getElementById('customAlert').style.display='none'; if(alertTimeout) clearTimeout(alertTimeout); }
 
-spinBtn.addEventListener('click', async () => {
-  if (spinning) return;
-  if (highlightedNumbers.size === totalNumbers) { showAlert('All numbers have been picked!'); return; }
+// --- BLOCK refresh until reset ---
+window.onbeforeunload = function(e){
+  if(blockRefresh){
+    e.preventDefault();
+    e.returnValue='';
+  }
+};
 
-  spinning = true;
-  try { spinSound.currentTime=0; spinSound.loop=true; await spinSound.play(); } catch(err){ console.warn(err); }
+spinBtn.addEventListener('click', async () => {
+  if(spinning) return;
+  if(highlightedNumbers.size===totalNumbers){ showAlert('All numbers picked!'); return; }
+
+  spinning=true;
+  blockRefresh=true; // block page refresh from now
+  try { spinSound.currentTime=0; spinSound.loop=true; await spinSound.play(); } catch(err){}
 
   const spinDuration=10000;
   const randomSpin=8+Math.random()*4;
@@ -332,6 +197,7 @@ spinBtn.addEventListener('click', async () => {
   }, spinDuration);
 });
 
+// --- RESET unlocks page ---
 resetBtn.addEventListener('click', () => {
   const password=prompt("Enter password to reset:");
   if(password==="1234"){
@@ -341,6 +207,8 @@ resetBtn.addEventListener('click', () => {
     currentRotation=0;
     svg.style.transition='';
     svg.style.transform='rotate(0deg)';
+    blockRefresh=false; // unlock page refresh
+    showAlert("Reset complete. Refresh now allowed!");
   } else showAlert("Incorrect password. Reset cancelled!");
 });
 </script>
