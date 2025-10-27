@@ -1,198 +1,367 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>5-slice Circle (Wheel with Pointer)</title>
-  <style>
-    body {
-      display:flex;
-      flex-direction: column;
-      height:100vh;
-      margin:0;
-      align-items:center;
-      justify-content:center;
-      background:#f3f4f6;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bingo Wheel</title>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: #f3f4f6;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    gap: 50px;
+  }
 
-    .wheel-container {
-      position: relative;
-      width: 420px;
-      height: 420px;
-    }
+  .left-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
 
-    svg { width:100%; height:100%; display:block; border-radius:50%; }
+  .bingo-board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border: 3px solid #000;
+    text-align: center;
+    background: #fff;
+    width: 500px;
+    height: 500px;
+  }
 
-    /* ===== POINTER STYLE ===== */
-    .pointer {
-      position: absolute;
-      top: -20px;           /* position above the wheel */
-      left: 50%;
-      transform: translateX(-50%) rotate(180deg);
-      width: 0;
-      height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-bottom: 25px solid #111827; /* arrow color */
-      z-index: 10;
-    }
+  .bingo-cell {
+    border: 1px solid #000;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+  }
 
-    /* ===== SLICE COLORS ===== */
-    #slice-1-alvin { fill: #ff4d4f; }    /* red */
-    #slice-2-paul  { fill: #ffd666; }    /* yellow */
-    #slice-3-joemar{ fill: #5b8def; }    /* blue */
-    #slice-4-gerry { fill: #6fcf97; }    /* green */
-    #slice-5-jaynan{ fill: #ff8fb3; }    /* pink */
+  .bingo-header {
+    background: #111827;
+    color: white;
+    font-size: 22px;
+  }
 
-    /* Divider lines */
-    .divider { stroke:#ffffff; stroke-width:2; }
+  .highlighted {
+    background: #ef4444;
+    border: 2px solid #000;
+    color: white;
+  }
 
-    /* Slice hover effect */
-    .slice:hover { filter:brightness(1.3); transform-origin: 200px 200px; }
+  .reset-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #ef4444;
+    color: white;
+    transition: background 0.3s ease;
+  }
+  .reset-btn:hover { background: #b91c1c; }
 
-    /* Text labels inside slices */
-    .slice-label {
-      font-weight:700;
-      font-size:14px;
-      fill:#0f172a;
-      pointer-events:none;
-      text-anchor:middle;
-    }
+  .wheel-container { position: relative; width: 420px; height: 420px; }
+  svg { width:100%; height:100%; display:block; border-radius:50%; }
 
-    /* center circle */
-    .center {
-      fill:#111827;
-      opacity:0.06;
-      stroke:#00000010;
-    }
+  .pointer {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%) rotate(180deg);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 25px solid #111827;
+    z-index: 10;
+  }
 
-    /* ===== SPIN BUTTON ===== */
-    .spin-btn {
-      margin-top: 30px;
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: 600;
-      background: #111827;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    .spin-btn:hover {
-      background: #374151;
-    }
-  </style>
+  .color-blue     { fill: #6ec1ff; }
+  .color-lavender { fill: #c48bff; }
+  .color-yellow   { fill: #ffe066; }
+  .color-green    { fill: #80e472; }
+  .color-orange   { fill: #ffb366; }
+
+  .slice:hover { filter:brightness(1.15); transform-origin:200px 200px; }
+
+  .slice-label {
+    font-weight:700;
+    font-size:9px;
+    fill:#111;
+    pointer-events:none;
+    text-anchor:middle;
+    dominant-baseline:middle;
+  }
+
+  .center {
+    fill:#111827;
+    opacity:0.06;
+    stroke:#00000010;
+  }
+
+  .spin-btn {
+    margin-top: 30px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    background: #111827;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  .spin-btn:hover { background: #374151; }
+
+  .right-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Custom alert */
+  #customAlert {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 25px 30px;
+    border: 3px solid #ef4444;
+    border-radius: 10px;
+    z-index: 1000;
+    font-family: sans-serif;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  #customAlert p {
+    margin: 0 0 15px 0;
+    font-size: 80px;
+  }
+  #customAlert button {
+    padding: 8px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    background: #ef4444;
+    color: white;
+    cursor: pointer;
+  }
+  #customAlert button:hover { background: #b91c1c; }
+</style>
 </head>
 <body>
+
+<div class="left-side">
+  <div class="bingo-board" id="bingoBoard"></div>
+  <button class="reset-btn" id="resetBtn">Reset</button>
+</div>
+
+<div class="right-side">
   <div class="wheel-container">
-    <!-- Pointer Arrow -->
     <div class="pointer"></div>
-
-    <!-- SVG Wheel -->
-    <svg viewBox="0 0 400 400" id="wheel" aria-label="5-slice wheel" role="img"></svg>
+    <svg viewBox="0 0 400 400" id="wheel"></svg>
   </div>
-
-  <!-- SPIN BUTTON -->
   <button class="spin-btn" id="spinBtn">🎡 Spin</button>
+</div>
 
-  <script>
-    (function(){
-      const svg = document.getElementById('wheel');
-      const cx = 200, cy = 200;
-      const r = 180;
-      const slices = 5;
-      const names = [
-        {id: 'slice-1-alvin', label: 'Alvin'},
-        {id: 'slice-2-paul', label: 'Paul'},
-        {id: 'slice-3-joemar', label: 'Joemar'},
-        {id: 'slice-4-gerry', label: 'Gerry'},
-        {id: 'slice-5-jaynan', label: 'Jaynan'}
-      ];
+<!-- Custom alert -->
+<div id="customAlert">
+  <p id="alertText"></p>
+  <button onclick="closeAlert()">OK</button>
+</div>
 
-      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      svg.appendChild(g);
+<!-- 🎵 Sound -->
+<audio id="spinSound" src="spineffect.mp3" preload="auto"></audio>
 
-      // Create slices
-      for (let i=0;i<slices;i++){
-        const startAngle = (i * 2 * Math.PI / slices) - Math.PI/2;
-        const endAngle   = ((i+1) * 2 * Math.PI / slices) - Math.PI/2;
-        const x1 = cx + r * Math.cos(startAngle);
-        const y1 = cy + r * Math.sin(startAngle);
-        const x2 = cx + r * Math.cos(endAngle);
-        const y2 = cy + r * Math.sin(endAngle);
-        const largeArc = (endAngle - startAngle) > Math.PI ? 1 : 0;
+<script>
+const board = document.getElementById('bingoBoard');
+const headers = ['B','I','N','G','O'];
+const totalNumbers = 75;
+const highlightedNumbers = new Set();
 
-        const d = [
-          `M ${cx} ${cy}`,
-          `L ${x1.toFixed(3)} ${y1.toFixed(3)}`,
-          `A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(3)} ${y2.toFixed(3)}`,
-          'Z'
-        ].join(' ');
+// Create Bingo board
+headers.forEach(h => {
+  const cell = document.createElement('div');
+  cell.className = 'bingo-cell bingo-header';
+  cell.textContent = h;
+  board.appendChild(cell);
+});
+for (let row=0; row<15; row++) {
+  for (let col=0; col<5; col++) {
+    const num = col*15 + (row+1);
+    const cell = document.createElement('div');
+    cell.className = 'bingo-cell';
+    cell.textContent = num;
+    cell.id = `bingo-${num}`;
+    board.appendChild(cell);
+  }
+}
 
-        const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-        path.setAttribute('d', d);
-        path.setAttribute('id', names[i].id);
-        path.setAttribute('class', 'slice');
-        path.setAttribute('stroke', 'white');
-        path.setAttribute('stroke-width', '1.5');
-        g.appendChild(path);
+// Create wheel
+const svg = document.getElementById('wheel');
+const cx=200, cy=200, r=180;
+const degPerSlice = 360/totalNumbers;
+const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+svg.appendChild(g);
 
-        // labels
-        const midAngle = (startAngle + endAngle) / 2;
-        const labelRadius = r * 0.62;
-        const lx = cx + labelRadius * Math.cos(midAngle);
-        const ly = cy + labelRadius * Math.sin(midAngle);
+let startDeg=-90;
+for(let i=0;i<totalNumbers;i++){
+  const endDeg=startDeg+degPerSlice;
+  const startRad=startDeg*Math.PI/180;
+  const endRad=endDeg*Math.PI/180;
+  const x1=cx+r*Math.cos(startRad);
+  const y1=cy+r*Math.sin(startRad);
+  const x2=cx+r*Math.cos(endRad);
+  const y2=cy+r*Math.sin(endRad);
+  const d=`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`;
 
-        const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-        text.setAttribute('x', lx.toFixed(3));
-        text.setAttribute('y', ly.toFixed(3));
-		text.setAttribute('transform', `rotate(${(midAngle * 180 / Math.PI) + 90} ${lx.toFixed(3)} ${ly.toFixed(3)})`);
-        text.setAttribute('class', 'slice-label');
-        text.textContent = names[i].label;
-        g.appendChild(text);
+  let colorClass='';
+  if(i<15) colorClass='color-blue';
+  else if(i<30) colorClass='color-lavender';
+  else if(i<45) colorClass='color-yellow';
+  else if(i<60) colorClass='color-green';
+  else colorClass='color-orange';
+
+  const slice=document.createElementNS('http://www.w3.org/2000/svg','path');
+  slice.setAttribute('d',d);
+  slice.setAttribute('class',`slice ${colorClass}`);
+  slice.setAttribute('id',`slice-${i+1}`);
+  g.appendChild(slice);
+
+  const midDeg=startDeg+degPerSlice/2;
+  const midRad=midDeg*Math.PI/180;
+  const textR=r*0.9;
+  const tx=cx+textR*Math.cos(midRad);
+  const ty=cy+textR*Math.sin(midRad);
+  const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+  text.setAttribute('x',tx);
+  text.setAttribute('y',ty);
+  text.setAttribute('class','slice-label');
+  text.setAttribute('transform',`rotate(${midDeg+90},${tx},${ty})`);
+  text.textContent=i+1;
+  g.appendChild(text);
+
+  startDeg=endDeg;
+}
+
+const centerCircle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+centerCircle.setAttribute('cx',cx);
+centerCircle.setAttribute('cy',cy);
+centerCircle.setAttribute('r',32);
+centerCircle.setAttribute('class','center');
+svg.appendChild(centerCircle);
+
+const spinBtn=document.getElementById('spinBtn');
+const resetBtn=document.getElementById('resetBtn');
+const spinSound=document.getElementById('spinSound');
+let spinning=false;
+let currentRotation=0;
+
+// Custom alert
+let alertTimeout;
+function showAlert(msg){
+  document.getElementById('alertText').textContent = msg;
+  const alertBox = document.getElementById('customAlert');
+  alertBox.style.display = 'block';
+  if(alertTimeout) clearTimeout(alertTimeout);
+  alertTimeout = setTimeout(() => {
+    alertBox.style.display = 'none';
+  }, 3000);
+}
+function closeAlert(){
+  document.getElementById('customAlert').style.display = 'none';
+  if(alertTimeout) clearTimeout(alertTimeout);
+}
+
+// 🎯 Spin logic - 10 seconds total
+spinBtn.addEventListener('click', async () => {
+  if (spinning) return;
+  if (highlightedNumbers.size === totalNumbers) {
+    showAlert('All numbers have been picked!');
+    return;
+  }
+
+  spinning = true;
+
+  // 🔊 Play sound
+  try {
+    spinSound.currentTime = 0;
+    spinSound.loop = true;
+    await spinSound.play();
+  } catch (err) {
+    console.warn("Sound could not play:", err);
+  }
+
+  // Spin settings (10s duration)
+  const spinDuration = 10 * 1000; // ms
+  const randomSpin = 8 + Math.random() * 4;
+  let rotation = currentRotation + randomSpin * 360 + Math.random() * 360;
+
+  svg.style.transition = `transform 10s cubic-bezier(0.33,1,0.68,1)`;
+  svg.style.transform = `rotate(${rotation}deg)`;
+  currentRotation = rotation;
+
+  // Show result at exactly 10 seconds
+  setTimeout(() => {
+    spinSound.loop = false;
+    spinSound.pause();
+    spinSound.currentTime = 0;
+    spinning = false;
+
+    let winningNumber;
+    do {
+      const normalized = rotation % 360;
+      const pointerAngle = (360 - normalized) % 360;
+      const winningSliceIndex = Math.floor(pointerAngle / degPerSlice);
+      winningNumber = winningSliceIndex + 1;
+      if (highlightedNumbers.has(winningNumber)) {
+        rotation += 15 + Math.random() * 10;
       }
+    } while (highlightedNumbers.has(winningNumber));
 
-      // center circle
-      const centerCircle = document.createElementNS('http://www.w3.org/2000/svg','circle');
-      centerCircle.setAttribute('cx', cx);
-      centerCircle.setAttribute('cy', cy);
-      centerCircle.setAttribute('r', 32);
-      centerCircle.setAttribute('class','center');
-      svg.appendChild(centerCircle);
+    highlightedNumbers.add(winningNumber);
 
-      // === Spin logic ===
-      const spinBtn = document.getElementById('spinBtn');
-      let spinning = false;
-      let currentRotation = 0;
+    const winningSlice = document.getElementById(`slice-${winningNumber}`);
+    winningSlice.style.filter='brightness(1.25)';
 
-      spinBtn.addEventListener('click', () => {
-        if (spinning) return;
-        spinning = true;
+    const winningCell = document.getElementById(`bingo-${winningNumber}`);
+    if(winningCell) winningCell.classList.add('highlighted');
 
-        const randomSpin = 5 + Math.random() * 5; // 5–10 full rotations
-        const extraAngle = Math.random() * 360;   // random stop angle
-        const rotation = currentRotation + randomSpin * 360 + extraAngle;
+    let letter = '';
+    if(winningNumber >= 1 && winningNumber <= 15) letter = 'B';
+    else if(winningNumber <= 30) letter = 'I';
+    else if(winningNumber <= 45) letter = 'N';
+    else if(winningNumber <= 60) letter = 'G';
+    else letter = 'O';
 
-        svg.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
-        svg.style.transform = `rotate(${rotation}deg)`;
-        currentRotation = rotation;
+    showAlert(`🎉 Sa letrang ${letter}: ${winningNumber}`);
+  }, spinDuration);
+});
 
-        setTimeout(() => {
-          spinning = false;
-
-          // Calculate which slice won
-          const normalizedRotation = rotation % 360;
-          const degreesPerSlice = 360 / slices;
-          // Pointer is at the top (0°), so we invert the angle
-          const winningIndex = Math.floor((360 - normalizedRotation) / degreesPerSlice) % slices;
-          const winner = names[winningIndex].label;
-
-          alert(`🎉 Congratulations ${winner}! You WON!`);
-        }, 4000);
-      });
-    })();
-  </script>
+// Reset
+resetBtn.addEventListener('click', () => {
+  const password = prompt("Enter password to reset:");
+  if(password === "1234"){
+    highlightedNumbers.clear();
+    document.querySelectorAll('.bingo-cell.highlighted').forEach(c=>c.classList.remove('highlighted'));
+    document.querySelectorAll('.slice').forEach(s=>s.style.filter='');
+    currentRotation=0;
+    svg.style.transition='';
+    svg.style.transform='rotate(0deg)';
+  } else {
+    showAlert("Incorrect password. Reset cancelled!");
+  }
+});
+</script>
 </body>
 </html>
