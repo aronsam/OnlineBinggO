@@ -78,24 +78,30 @@
   }
   .spin-btn:hover { background: #374151; }
 
+  /* 🌀 BIGGER WHEEL */
   .wheel-container {
     position: relative;
-    width: 420px;
-    height: 420px;
+    width: 650px;
+    height: 650px;
   }
 
-  svg { width:100%; height:100%; display:block; border-radius:50%; }
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 50%;
+  }
 
   .pointer {
     position: absolute;
-    top: -20px;
+    top: -30px;
     left: 50%;
     transform: translateX(-50%) rotate(180deg);
     width: 0;
     height: 0;
-    border-left: 15px solid transparent;
-    border-right: 15px solid transparent;
-    border-bottom: 25px solid #111827;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 35px solid #111827;
     z-index: 10;
   }
 
@@ -105,21 +111,21 @@
   .color-green    { fill: #80e472; }
   .color-orange   { fill: #ffb366; }
 
-  .slice:hover { filter:brightness(1.15); transform-origin:200px 200px; }
+  .slice:hover { filter: brightness(1.15); transform-origin: 325px 325px; }
 
   .slice-label {
-    font-weight:700;
-    font-size:9px;
-    fill:#111;
-    pointer-events:none;
-    text-anchor:middle;
-    dominant-baseline:middle;
+    font-weight: 700;
+    font-size: 12px;
+    fill: #111;
+    pointer-events: none;
+    text-anchor: middle;
+    dominant-baseline: middle;
   }
 
   .center {
-    fill:#111827;
-    opacity:0.06;
-    stroke:#00000010;
+    fill: #111827;
+    opacity: 0.06;
+    stroke: #00000010;
   }
 
   /* Custom alert */
@@ -169,7 +175,7 @@
 <!-- WHEEL BELOW -->
 <div class="wheel-container">
   <div class="pointer"></div>
-  <svg viewBox="0 0 400 400" id="wheel"></svg>
+  <svg viewBox="0 0 650 650" id="wheel"></svg>
 </div>
 
 <!-- Custom alert -->
@@ -205,65 +211,65 @@ for (let row=0; row<15; row++) {
   }
 }
 
-// Create wheel
+// Create wheel (bigger)
 const svg = document.getElementById('wheel');
-const cx=200, cy=200, r=180;
-const degPerSlice = 360/totalNumbers;
+const cx = 325, cy = 325, r = 300;
+const degPerSlice = 360 / totalNumbers;
 const g = document.createElementNS('http://www.w3.org/2000/svg','g');
 svg.appendChild(g);
 
-let startDeg=-90;
+let startDeg = -90;
 for(let i=0;i<totalNumbers;i++){
-  const endDeg=startDeg+degPerSlice;
-  const startRad=startDeg*Math.PI/180;
-  const endRad=endDeg*Math.PI/180;
-  const x1=cx+r*Math.cos(startRad);
-  const y1=cy+r*Math.sin(startRad);
-  const x2=cx+r*Math.cos(endRad);
-  const y2=cy+r*Math.sin(endRad);
-  const d=`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`;
+  const endDeg = startDeg + degPerSlice;
+  const startRad = startDeg * Math.PI / 180;
+  const endRad = endDeg * Math.PI / 180;
+  const x1 = cx + r * Math.cos(startRad);
+  const y1 = cy + r * Math.sin(startRad);
+  const x2 = cx + r * Math.cos(endRad);
+  const y2 = cy + r * Math.sin(endRad);
+  const d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`;
 
-  let colorClass='';
-  if(i<15) colorClass='color-blue';
-  else if(i<30) colorClass='color-lavender';
-  else if(i<45) colorClass='color-yellow';
-  else if(i<60) colorClass='color-green';
+  let colorClass = '';
+  if (i<15) colorClass='color-blue';
+  else if (i<30) colorClass='color-lavender';
+  else if (i<45) colorClass='color-yellow';
+  else if (i<60) colorClass='color-green';
   else colorClass='color-orange';
 
-  const slice=document.createElementNS('http://www.w3.org/2000/svg','path');
-  slice.setAttribute('d',d);
-  slice.setAttribute('class',`slice ${colorClass}`);
-  slice.setAttribute('id',`slice-${i+1}`);
+  const slice = document.createElementNS('http://www.w3.org/2000/svg','path');
+  slice.setAttribute('d', d);
+  slice.setAttribute('class', `slice ${colorClass}`);
+  slice.setAttribute('id', `slice-${i+1}`);
   g.appendChild(slice);
 
-  const midDeg=startDeg+degPerSlice/2;
-  const midRad=midDeg*Math.PI/180;
-  const textR=r*0.9;
-  const tx=cx+textR*Math.cos(midRad);
-  const ty=cy+textR*Math.sin(midRad);
-  const text=document.createElementNS('http://www.w3.org/2000/svg','text');
-  text.setAttribute('x',tx);
-  text.setAttribute('y',ty);
-  text.setAttribute('class','slice-label');
-  text.setAttribute('transform',`rotate(${midDeg+90},${tx},${ty})`);
-  text.textContent=i+1;
+  const midDeg = startDeg + degPerSlice / 2;
+  const midRad = midDeg * Math.PI / 180;
+  const textR = r * 0.9;
+  const tx = cx + textR * Math.cos(midRad);
+  const ty = cy + textR * Math.sin(midRad);
+  const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+  text.setAttribute('x', tx);
+  text.setAttribute('y', ty);
+  text.setAttribute('class', 'slice-label');
+  text.setAttribute('transform', `rotate(${midDeg+90},${tx},${ty})`);
+  text.textContent = i + 1;
   g.appendChild(text);
 
-  startDeg=endDeg;
+  startDeg = endDeg;
 }
 
-const centerCircle=document.createElementNS('http://www.w3.org/2000/svg','circle');
-centerCircle.setAttribute('cx',cx);
-centerCircle.setAttribute('cy',cy);
-centerCircle.setAttribute('r',32);
-centerCircle.setAttribute('class','center');
+const centerCircle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+centerCircle.setAttribute('cx', cx);
+centerCircle.setAttribute('cy', cy);
+centerCircle.setAttribute('r', 45);
+centerCircle.setAttribute('class', 'center');
 svg.appendChild(centerCircle);
 
-const spinBtn=document.getElementById('spinBtn');
-const resetBtn=document.getElementById('resetBtn');
-const spinSound=document.getElementById('spinSound');
-let spinning=false;
-let currentRotation=0;
+const spinBtn = document.getElementById('spinBtn');
+const resetBtn = document.getElementById('resetBtn');
+const spinSound = document.getElementById('spinSound');
+let spinning = false;
+let currentRotation = 0;
 
 // Custom alert
 let alertTimeout;
@@ -300,8 +306,7 @@ spinBtn.addEventListener('click', async () => {
     console.warn("Sound could not play:", err);
   }
 
-  // Spin settings (10s duration)
-  const spinDuration = 10 * 1000; // ms
+  const spinDuration = 10 * 1000;
   const randomSpin = 8 + Math.random() * 4;
   let rotation = currentRotation + randomSpin * 360 + Math.random() * 360;
 
@@ -309,7 +314,6 @@ spinBtn.addEventListener('click', async () => {
   svg.style.transform = `rotate(${rotation}deg)`;
   currentRotation = rotation;
 
-  // Show result at exactly 10 seconds
   setTimeout(() => {
     spinSound.loop = false;
     spinSound.pause();
@@ -336,7 +340,7 @@ spinBtn.addEventListener('click', async () => {
     if(winningCell) winningCell.classList.add('highlighted');
 
     let letter = '';
-    if(winningNumber >= 1 && winningNumber <= 15) letter = 'B';
+    if(winningNumber <= 15) letter = 'B';
     else if(winningNumber <= 30) letter = 'I';
     else if(winningNumber <= 45) letter = 'N';
     else if(winningNumber <= 60) letter = 'G';
